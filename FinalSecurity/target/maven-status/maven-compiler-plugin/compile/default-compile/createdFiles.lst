@@ -1,0 +1,7 @@
+Spring\FinalSecurity\FinalSecurityApplication.class
+Spring\FinalSecurity\controller\ProductController.class
+Spring\FinalSecurity\model\Roles.class
+Spring\FinalSecurity\service\UserService.class
+Spring\FinalSecurity\config\Config.class
+Spring\FinalSecurity\model\User.class
+Spring\FinalSecurity\repo\UserRepository.class

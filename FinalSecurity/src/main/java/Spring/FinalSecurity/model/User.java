@@ -1,46 +1,53 @@
 package Spring.FinalSecurity.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "UserDetails")
+@Table(name = "users")
 public class User implements UserDetails {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    @Column(name = "username")
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
-    @Column(name = "role")
-    private String role;
 
-    public String getRole() {
-        return role;
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Roles> roles = new HashSet<>();
+
+    // Default constructor
+    public User() {}
+
+    // Constructor for convenience
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
+    // Implementing UserDetails interface methods
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(()->role);
-    }
-
-    public String getPassword() {
-        return password;
+        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
+        for (Roles role : roles) {
+            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));  // Fix here
+        }
+        return authorities;
     }
 
     @Override
@@ -48,35 +55,32 @@ public class User implements UserDetails {
         return username;
     }
 
+    @Override
+    public String getPassword() {
+        return password;
+    }
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;  // Implement custom logic if required
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;  // Implement custom logic if required
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;  // Implement custom logic if required
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;  // Implement custom logic if required
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    private String password;
-
-
-
+    // Getters and setters
     public Integer getId() {
         return id;
     }
@@ -85,7 +89,19 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public Collection<Object> getRoles() {
-        return Collections.singleton(role);
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Set<Roles> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Roles> roles) {
+        this.roles = roles;
     }
 }
