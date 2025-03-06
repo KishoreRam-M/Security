@@ -13,15 +13,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final JwtFilter jwtFilter;
     private final UserDetailsService service;
 
-    public SecurityConfig(UserDetailsService service) {
+    public SecurityConfig(JwtFilter jwtFilter, UserDetailsService service) {
+        this.jwtFilter = jwtFilter;
         this.service = service;
     }
 
@@ -34,7 +37,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

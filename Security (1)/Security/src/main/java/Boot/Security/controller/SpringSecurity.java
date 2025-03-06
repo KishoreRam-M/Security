@@ -2,6 +2,7 @@ package Boot.Security.controller;
 
 import Boot.Security.mode.Users;
 import Boot.Security.services.AuthService;
+import Boot.Security.services.JwtService;
 import Boot.Security.services.MyUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SpringSecurity {
+    @Autowired
+    JwtService jwt;
     @Autowired
     MyUserDetailsService service;
     @Autowired
@@ -33,6 +36,6 @@ public class SpringSecurity {
     public String login(@RequestBody Users user)
     {
 
-        return s.verify( user);
+        return jwt.verify( user);
     }
 }
